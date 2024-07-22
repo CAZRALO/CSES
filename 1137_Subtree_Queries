@@ -1,0 +1,95 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+template<typename... T>
+void see(T&... args) { ((cin >> args), ...);}
+template<typename... T>
+void put(T&&... args) { ((cout << args << " "), ...);}
+template<typename... T>
+void putl(T&&... args) { ((cout << args << " "), ...); cout<<'\n';}
+#define st first
+#define nd second
+#define int long long
+#define str string
+#define all(a) a.begin(), a.end()
+#define pb push_back
+#define lb lower_bound
+#define ub upper_bound
+#define fu(i,a,b) for(int i=a;i<=b;++i)
+#define fd(i,a,b) for(int i=a;i>=b;--i)
+#define f0u(i,b)  for(int i=0;i<b;++i)
+#define f0d(i,b)  for(int i=(b)-1;i>=0;--i)
+#define FU(i,a,b,x) for (int i=a;i<=b;i+=x)
+#define FD(i,a,b,x) for (int i=a;i>=b;i-=x)
+#define trav(a, x) for (auto &a : x)
+#define pii pair<int,int>
+
+const int MOD=1e9+7;
+const int dx[4] = {1, 0, -1, 0},
+          dy[4] = {0, 1, 0, -1};
+
+vector<vector<int>>adj(200005);
+vector<int>Val(400005);
+vector<int>A(200005);
+int timedfs=0;
+vector<int>in(200005),out(200005);
+
+void update(int idx,int val) {
+    for (int i=idx;i<=400000;i+=i&-i) {
+        Val[i]+=val;
+    }
+}
+
+int query(int idx) {
+    int sum=0;
+    for (int i=idx;i>0;i-=i&-i) {
+        sum+=Val[i];
+    }
+    return sum;
+}
+
+void dfs(int u,int par = 0){
+    in[u]=++timedfs;
+    for (int v : adj[u]) {
+        if (v!=par) {
+            dfs(v,u);
+        }
+    }
+    out[u]=++timedfs;
+}
+
+signed main(signed argc, char *argv[]) {
+    ios_base::sync_with_stdio(NULL);
+    cin.tie(nullptr); cout.tie(nullptr);
+    int n,q;
+    cin>>n>>q;
+    fu(i,1,n) {
+        cin>>A[i];
+    }
+    fu(i,1,n-1) {
+        int u,v;
+        cin>>u>>v;
+        adj[u].pb(v);
+        adj[v].pb(u);
+    }
+    dfs(1);
+    fu(i,1,n) {
+        update(out[i],A[i]);
+    }
+    while (q--) {
+        int num;
+        cin>>num;
+        if (num==1){
+            int node,val;
+            cin>>node>>val;
+            update(out[node],-A[node]);
+            update(out[node],val);
+            A[node]=val;
+        } else {
+            int node;
+            cin>>node;
+            cout<<query(out[node])-query(in[node])<<'\n';
+        }
+    }
+    return 0;
+}
