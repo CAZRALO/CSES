@@ -34,46 +34,23 @@ const int N=1e5;
 const signed dx[4] = {1, 0, -1, 0},
              dy[4] = {0, 1, 0, -1};
 
-tcT>inline T gcd(T a,T b) { while (b != 0) swap(b, a %= b); return a; }
-tcT>inline T lcm(T a,T b) { return a / gcd(a, b) * b; }
-tcT>inline tuple<T,T,T> extgcd(T a,T b) {
-    if(a==0)return mt(b,0,1);
-    T g,x,y;
-	tie(g,x,y)=extgcd(b%a,a);
-    return mt(g,y-(b/a)*x,x);
-}
-tcT > bool minimize(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
-tcT > bool maximize(T &a, const T &b) { return a < b ? a = b, 1 : 0; }
-tcT > void add(T &a, const T &b) { a+=b; if (a>MOD) a-=MOD; }
-tcT > void multiply(T &a, const T &b) { a=(a*b)%MOD; }
-constexpr int pct(int x) { return __builtin_popcount(x); }
-constexpr int ctz(int x) { return __builtin_ctzll(x); }
-constexpr int clz(int x) { return __builtin_clzll(x); }
-constexpr int bits(int x) {  // assert(x >= 0);
-	return x == 0 ? 0 : 31 - __builtin_clz(x);
-}  // floor(log2(x))
-constexpr int MASK(int x) { return 1ll << (x); }
-
 void power(int F[2][2],int n);
 void multiply(int F[2][2], int M[2][2]);
 
 int fibo(int n){
-    if (n==0) {
-        return 0;
-    }
-    int F[2][2]={ {1 , 1} , {1 , 0} };
+    if (n==0) return 0;
+    int F[2][2]={{1 , 1},
+                 {1 , 0}};
     power(F,n);
-    return F[0][0]%MOD;
+    return F[0][1]%MOD;
 }
 
 void power(int F[2][2], int n) {
-    if (n==1 || n==0) {
-        return;
-    }
-    int M[2][2]={ {1 , 1} , {1 , 0} };
+    if (n==1 || n==0) return;
+    int M[2][2]={{1 , 1}
+                ,{1 , 0}};
     power(F,n>>1);
     multiply(F,F);
-
     if (n&1) {
         multiply(F,M);
     }
@@ -90,6 +67,10 @@ void multiply(int F[2][2], int M[2][2]) {
     F[1][0] = z; F[1][1] = w;
 }
 void solve() {
+    int n;
+    see(n);
+    int res=fibo(n);
+    putl(res);
 }
 
 signed main(signed argc, char *argv[]) {
