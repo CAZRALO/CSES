@@ -9,7 +9,7 @@ void see(T&... args) { ((cin >> args), ...);}
 template<typename... T>
 void put(T&&... args) { ((cout << args << " "), ...);}
 template<typename... T>
-void putl(T&&... args) { ((cout << args << "\n"), ...);}
+void putl(T&&... args) { ((cout << args << " "), ...); cout<<'\n'; }
 #define int long long
 #define fi first
 #define se second
@@ -43,8 +43,8 @@ tcT>inline tuple<T,T,T> extgcd(T a,T b) {
 	tie(g,x,y)=extgcd(b%a,a);
     return mt(g,y-(b/a)*x,x);
 }
-tcT > bool minimize(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
-tcT > bool maximize(T &a, const T &b) { return a < b ? a = b, 1 : 0; }
+tcTU > bool minimize(T &a, const U &b) { return b < a ? a = b, 1 : 0; }
+tcTU > bool maximize(T &a, const U &b) { return a < b ? a = b, 1 : 0; }
 tcT > void add(T &a, const T &b) { a+=b; if (a>MOD) a-=MOD; }
 tcT > void multiply(T &a, const T &b) { a=(a*b)%MOD; }
 constexpr int pct(int x) { return __builtin_popcount(x); }
@@ -57,13 +57,19 @@ constexpr int MASK(int x) { return 1ll << (x); }
 constexpr int msk(int x) { return (1ll << (x))-1; }
 
 int C[1000005];
+vector<int>dp(1000005,INT_MAX);
 
 void solve() {
     int n,x;
     see(n,x);
-    //fu(i,1,n) see(difficulty[i],skins[i]);
     fu(i,1,n) see(C[i]);
-    
+    dp[0]=0;
+    fu(i,1,n) {
+        fu(weight,C[i],x) {
+            minimize(dp[weight],dp[weight-C[i]]+1);
+        }
+    }
+    putl((dp[x]==INT_MAX?-1:dp[x]));
 }
 
 signed main(signed argc, char *argv[]) {
