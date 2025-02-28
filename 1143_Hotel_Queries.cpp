@@ -1,76 +1,120 @@
 #include<bits/stdc++.h>
 using namespace std;
-template<typename... T>
-void see(T&... args) { ((cin >> args), ...);}
-template<typename... T>
-void put(T&&... args) { ((cout << args << " "), ...);}
-template<typename... T>
-void putl(T&&... args) { ((cout << args << " "), ...); cout<<'\n';}
+ 
+#define st first
+#define nd second
 #define int long long
+#define str string
+#define MASK(x) (1ll<<x)
+#define bg begin()
+#define end end()
+#define rbg rbegin()
+#define rend rend()
+#define all(a) a.bg, a.end
+#define rall(a) a.rbg, a.rend
 #define pb push_back
-#define F first
-#define S second
-#define ll long long
-#define ull unsigned long long
-#define ld long double
-#define pii pair<int,int>
-#define tiii tuple<int,int,int>
-#define vi vector<int>
-#define vii vector<pii>
-#define vc vector
-#define L cout<<'\n';
-#define E cerr<<'\n';
-#define all(x) x.begin(),x.end()
+#define ins insert
+#define lb lower_bound
+#define ub upper_bound
 #define fu(i,a,b) for(int i=a;i<=b;++i)
-#define rep(i,a,b) for (int i=a; i<b; ++i)
-#define rev(i,a,b) for (int i=a; i>b; --i)
-#define IOS ios_base::sync_with_stdio(false);cin.tie(0);cout.tie(0);
-#define setpr(x) cout<<setprecision(x)<<fixed
-#define sz size()
-#define seea(a,x,y) for(int i=x;i<y;i++){cin>>a[i];}
-#define seev(v,n) for(int i=0;i<n;i++){int x; cin>>x; v.push_back(x);}
-#define sees(s,n) for(int i=0;i<n;i++){int x; cin>>x; s.insert(x);}
-const ll inf = 1LL<<62;
-const ld ep = 0.0000001;
-const ld pi = acos(-1.0);
-const ll md = 1000000007;
+#define fd(i,a,b) for(int i=a;i>=b;--i)
+#define f0u(i,b)  for(int i=0;i<b;++i)
+#define f0d(i,b)  for(int i=(b)-1;i>=0;--i)
+#define FU(i,a,b,x) for (int i=a;i<=b;i+=x)
+#define FD(i,a,b,x) for (int i=a;i>=b;i-=x)
+#define trav(a, x) for (auto &a : x)
+#define pii pair<int,int>
  
-const int N = 2000005;
-int ST[2*N],n;
-void update(int pos, int val) {
-    for (ST[pos += n] = val; pos >= 1; pos >>= 1) {
-        ST[pos>>1]=max(ST[pos], ST[pos^1]);
+const int MOD = 1e9 + 7;
+const int dx[4] = {1, 0, -1, 0},
+          dy[4] = {0, 1, 0, -1};
+const long long inf = LLONG_MAX; 
+const signed N = 2e5+5;
+ 
+void setIO() {
+    ios_base::sync_with_stdio(NULL);
+    cin.tie(nullptr); cout.tie(nullptr);
+    bool check = 0;
+    //check = 1;
+    if (check) {
+        freopen("chiaphong.inp","r",stdin);
+        freopen("chiaphong.out","w",stdout);
     }
 }
-int query(int val) {
-    if (ST[1]<val) return 0;
-    int pos = 1;
-    for (;pos <= n;) {
-        if (ST[pos<<1]>=val) pos <<= 1;
-        else pos = pos << 1 | 1;
+ 
+int a[N];
+int n,m;
+ 
+class SegmentTree {
+private : 
+    vector<int>tree;
+    void build(int node, int l, int r) {
+        if (l > r) return;
+        if (l == r) {
+            tree[node] = a[l];
+            return;
+        }
+        int mid = (l + r) >> 1;
+        build(node << 1, l, mid);
+        build(node << 1 | 1, mid + 1, r);
+        tree[node] = max(tree[node << 1],tree[node << 1 | 1]);
     }
-    return pos-n;
+    void update(int node, int l, int r, int i, int val) {
+        if (i > r || i < l) return;
+        if (l == r) {
+            tree[node] = val;
+            return;
+        }
+        int mid = (l + r) >> 1;
+        update(node << 1, l, mid, i, val);
+        update(node << 1 | 1, mid + 1, r, i, val);
+        tree[node] = max(tree[node << 1], tree[node << 1 | 1]);
+    }
+    int query(int node, int l,int r, int u,int v, int val) {
+        if (v < l || r < u) return -1;
+        if (u <= l && r <= v) {
+            if (tree[node] < val) return -1;
+            while (l != r){
+                int mid = (l + r) >> 1;
+                if (tree[node << 1] >= val) node <<= 1, r = mid;
+                else node = node << 1 | 1, l = mid + 1;
+            }
+            return l;
+        }
+        int mid = (l + r) >> 1;
+        int value = query(node << 1, l, mid, u, v, val);
+        return (value != -1 ? value : query(node << 1, mid + 1, r, u, v, val));
+    }
+public : 
+    SegmentTree() {
+        tree.resize(n << 2);
+        build(1, 1, n);
+    }
+    int findFirstGreaterOrEqual(int l, int r, int val) {
+        return query(1, 1, n, l, r, val);
+    }
+    void update(int idx, int val) {
+        update(1, 1, n, idx, val);
+    }
+};
+void solve() {
+    cin >> n >> m;
+    fu(i,1,n) cin >> a[i];
+    SegmentTree st;
+    int numOfVisitors;
+    fu(i,1,m) {
+        cin >> numOfVisitors;
+        int idx = st.findFirstGreaterOrEqual(1,n,numOfVisitors);
+        if (idx != -1) {
+            cout << idx << ' ';
+            a[idx] -= numOfVisitors;
+            st.update(idx,a[idx]);
+        } else cout << "0 ";
+    }
 }
  
-void solve(){
-    int m; see(n,m);
-    int nn=n;
-    n=ceil(log2(n*1.0));
-    n=1<<n;
-    fu(i,1,nn) {
-        int x;
-        cin>>x;
-        update(i,x);
-    }
-    while (m--) {
-        int r;
-        cin >> r;
-        int id=query(r);
-        put(id); 
-        if (id) update(id,ST[id+n]-r);
-    }
-}    
-signed main(){
-    IOS;
+signed main(signed argc, char *argv[]) {
+    setIO();
     solve();
+    return 0;  
 }
